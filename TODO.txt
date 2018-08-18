@@ -1,0 +1,23 @@
+TO-DO
+-----
+1. Build main function
+--> Command line arguments
+--> moduling parsing/execution
+--> error handling
+
+2. Create module template
+--> ensure that it is able to be replicated easily
+
+3. Source compatible libraries for various protocols
+--> SMB (v1,2,3)
+--> HTTP
+--> FTP
+--> SSH
+
+4. Source compatible libraries for various authentication mechanisms
+--> NTLM
+--> DIGEST
+--> BASIC AUTH
+
+5. Ensure cross platform build compatibility
+--> Go should handle this on its own

@@ -1,0 +1,26 @@
+errorLevel.Sprint("************************************************"),
+infoMsg.Sprint("                   ,--.                            "),
+infoMsg.Sprint("          ,--.  .--,`) )  .--,                     "),
+infoMsg.Sprint("       .--,`) \( (` /,--./ (`                      "),
+infoMsg.Sprint("      ( ( ,--.  ) )\ /`) ).--,-.                   "),
+infoMsg.Sprint("       ;.__`) )/ /) ) ( (( (`_) )                  "),
+infoMsg.Sprint("      ( (  / /( (.' "-.) )) )__.'-,                "),
+infoMsg.Sprint("     _,--.( ( /`         `,/ ,--,) )               "),
+infoMsg.Sprint("    ( (``) \,` ==.    .==  \( (`,-;                "),
+infoMsg.Sprint("     ;-,( (_) ~6~ \  / ~6~ (_) )_) )               "),
+infoMsg.Sprint("    ( (_ \_ (      )(      )__/___.'               "),
+infoMsg.Sprint("    '.__,-,\ \     ''     /\ ,-.                   "),
+infoMsg.Sprint("       ( (_/ /\    __    /\ \_) )                  "),
+infoMsg.Sprint("        '._.'  \  \__/  /  '._.'                   "),
+infoMsg.Sprint("            .--`\      /`--.                       "),
+infoMsg.Sprint("                 '----'                            "),
+infoMsg.Sprint("                                                   "),
+errorLevel.Sprint("************************************************"),
+
+infoMsg.Sprint("                 GOrgon
+infoMsg.Sprint("                 	v. 0.0.1
+infoMsg.Sprint("                                                               
+infoMsg.Sprint("                 	-BY-                                      "),
+infoMsg.Sprint("                 		dru1d            					  "),
+infoMsg.Sprint("                                                              "),
+infoMsg.Sprint("       github.com/dru1d-foofus/gorgon     

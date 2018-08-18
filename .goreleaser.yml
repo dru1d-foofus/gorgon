@@ -1,0 +1,15 @@
+# Build customization
+project_name: gorgon
+builds:
+  - main: ./cmd/gorgon/main.go
+    binary: gorgon
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - amd64
+    ldflags: -s
+# Archive customization
+archive:
+  format: zip
