@@ -1,7 +1,7 @@
 //	Name: SSH Module
 //	Usage: Used for bruteforcing SSH services
-//  Credits: github.com/aldenso/sshgobrute
-//	Author: dru1d
+//	Credits: github.com/aldenso/sshgobrute
+//	Author(s): dru1d, stumblebot
 
 package main
 
@@ -167,6 +167,7 @@ func sshAuth(username string, password string, host string, port string, timer i
 
 
 func sshCombo(c *cli.Context) error {
+// combo file logic
 	if c.String("file") == "" {
 	return errors.New("must supply a combo file to this command")
 	}
@@ -192,26 +193,26 @@ func sshCombo(c *cli.Context) error {
 
 
 func sshPlaintext(c *cli.Context) error {
-//	host := c.String("host")
 	if c.String("userfile") != "" {
 		users, err := readLines(c.String("userfile"))
 		if err != nil {
 			log.Fatalf("readLines: %s", err)
 		}
 		for user := range users {
+// userfile + passfile
 			if c.String("passfile") != "" {
 				passwords, err := readLines(c.String("passfile"))
 				if err != nil {
 					log.Fatalf("readLines: %s", err)
 				}
 				for password := range passwords {
-				//fmt.Println(users[user], passwords[password] )
 					resp := sshAuth(users[user],passwords[password], c.String("host"),c.String("port"),c.Int("timeout"))
 		        	resp.mu.Lock()
 	            		if resp.Error == nil {
 			        		resp.mu.Unlock()
 					}
 				}
+// userfile + password
 			} else {
 				resp := sshAuth(users[user],c.String("password"), c.String("host"),c.String("port"),c.Int("timeout"))
 				resp.mu.Lock()
@@ -221,6 +222,7 @@ func sshPlaintext(c *cli.Context) error {
 			}
 		}
 	} else {
+// username + passfile
 		if c.String("passfile") != "" {
 			passwords, err := readLines(c.String("passfile"))
 			if err != nil {
@@ -234,6 +236,7 @@ func sshPlaintext(c *cli.Context) error {
 					}
 			}
 		} else {
+// username + password
 			resp := sshAuth(c.String("user"),c.String("password"),c.String("host"),c.String("port"),c.Int("timeout"))
 			resp.mu.Lock()
 				if resp.Error == nil {
