@@ -26,7 +26,9 @@ Everything else should be self-explanatory.
 ![start menu](https://i.imgur.com/a7JYzYx.png)
 
 ## To-Do
-- [ ] Finish SSH bruteforce module; this mainly the plaintext argument
+- [x] Finish SSH bruteforce module; this mainly the plaintext argument
+- [ ] Add output option
+- [ ] Add parallelism/concurrency
 - [ ] SMB module with SMBv(1/2/3) support and pth
 - [ ] RDP module with pth support
 - [ ] Replicating all existing and relevant modules that currently exist with Medusa
