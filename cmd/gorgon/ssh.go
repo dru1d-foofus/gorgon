@@ -29,7 +29,7 @@ sshSubcommands = []cli.Command{
 			Flags: []cli.Flag {
 				cli.StringFlag {
 					Name:  "file, f",
-					Usage: "combo file in: HOST:USER:PASS format",
+					Usage: "combo file in tab delimited format: ex. HOST[TAB]USER[TAB]PASS format",
 				},
 				cli.StringFlag {
 					Name:  "port",
@@ -104,30 +104,6 @@ type fileScanner struct {
 }
 
 
-func newFileScanner() *fileScanner {
-	return &fileScanner {}
-}
-
-
-func (f *fileScanner) Open(path string) (err error) {
-	f.File, err = os.Open(path)
-	return err
-}
-
-
-func (f *fileScanner) Close () error {
-	return f.File.Close()
-}
-
-
-func (f *fileScanner) GetScan() *bufio.Scanner {
-	if f.Scanner == nil {
-		f.Scanner = bufio.NewScanner(f.File)
-		f.Scanner.Split(bufio.ScanLines)
-	}
-	return f.Scanner
-}
-
 func readLines(path string) ([]string, error) {
 	file, err := os.Open(path)
 	if err != nil {
@@ -172,15 +148,14 @@ func sshCombo(c *cli.Context) error {
 	return errors.New("must supply a combo file to this command")
 	}
 	if c.String("file") != "" {
-		combofile := newFileScanner()
-		err := combofile.Open(c.String("file"))
+		combos, err := readLines(c.String("file"))
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("readLine: %s", err)
 		}
-		comboscanner := combofile.GetScan()
-		for comboscanner.Scan() {
-			combosplice := strings.Split(comboscanner.Text(), ":")
+		for combo := range combos {
+			combosplice := strings.Split(combos[combo], "\t")
 			host,user,password := combosplice[0],combosplice[1],combosplice[2]
+//			fmt.Printf("\nUser: %s Password:%s Host: %s", user,password,host)
 			resp := sshAuth(user,password,host,c.String("port"),c.Int("timeout"))
 			resp.mu.Lock()
 			if resp.Error == nil {
