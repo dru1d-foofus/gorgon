@@ -192,26 +192,53 @@ func sshCombo(c *cli.Context) error {
 
 
 func sshPlaintext(c *cli.Context) error {
-	host := c.String("host")
+//	host := c.String("host")
 	if c.String("userfile") != "" {
 		users, err := readLines(c.String("userfile"))
 		if err != nil {
 			log.Fatalf("readLines: %s", err)
 		}
 		for user := range users {
+			if c.String("passfile") != "" {
+				passwords, err := readLines(c.String("passfile"))
+				if err != nil {
+					log.Fatalf("readLines: %s", err)
+				}
+				for password := range passwords {
+				//fmt.Println(users[user], passwords[password] )
+					resp := sshAuth(users[user],passwords[password], c.String("host"),c.String("port"),c.Int("timeout"))
+		        	resp.mu.Lock()
+	            		if resp.Error == nil {
+			        		resp.mu.Unlock()
+					}
+				}
+			} else {
+				resp := sshAuth(users[user],c.String("password"), c.String("host"),c.String("port"),c.Int("timeout"))
+				resp.mu.Lock()
+					if resp.Error == nil {
+						resp.mu.Unlock()
+					}
+			}
+		}
+	} else {
+		if c.String("passfile") != "" {
 			passwords, err := readLines(c.String("passfile"))
 			if err != nil {
-				log.Fatalf("readLines: %s", err)
+				log.Fatalf("readLine: %s", err)
 			}
 			for password := range passwords {
-				//fmt.Println(users[user], passwords[password] )
-				resp := sshAuth(users[user],passwords[password], host,c.String("port"),c.Int("timeout"))
-		                resp.mu.Lock()
-	                        if resp.Error == nil {
-			                resp.mu.Unlock()
-				}
-
+				resp := sshAuth(c.String("user"),passwords[password],c.String("host"),c.String("port"),c.Int("timeout"))
+				resp.mu.Lock()
+					if resp.Error == nil {
+						resp.mu.Unlock()
+					}
 			}
+		} else {
+			resp := sshAuth(c.String("user"),c.String("password"),c.String("host"),c.String("port"),c.Int("timeout"))
+			resp.mu.Lock()
+				if resp.Error == nil {
+					resp.mu.Unlock()
+				}
 		}
 	}
 	return nil
