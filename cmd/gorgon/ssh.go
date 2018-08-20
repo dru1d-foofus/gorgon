@@ -12,9 +12,8 @@ import (
 	"strings"
 	"sync"
 	"time"
-	"os"
-	"bufio"
 	"golang.org/x/crypto/ssh"
+	"github.com/dru1d-foofus/gorgon/helpers/files"
 	"github.com/fatih/color"
 	"github.com/urfave/cli"
 )
@@ -98,26 +97,21 @@ type resp struct {
 	mu sync.Mutex
 }
 
-type fileScanner struct {
-	File	*os.File
-	Scanner *bufio.Scanner
-}
 
+// func readLines(path string) ([]string, error) {
+// 	file, err := os.Open(path)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	defer file.Close()
 
-func readLines(path string) ([]string, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	var lines []string
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
-	}
-	return lines, scanner.Err()
-}
+// 	var lines []string
+// 	scanner := bufio.NewScanner(file)
+// 	for scanner.Scan() {
+// 		lines = append(lines, scanner.Text())
+// 	}
+// 	return lines, scanner.Err()
+// }
 
 
 func sshAuth(username string, password string, host string, port string, timer int) *resp {
@@ -148,7 +142,7 @@ func sshCombo(c *cli.Context) error {
 	return errors.New("must supply a combo file to this command")
 	}
 	if c.String("file") != "" {
-		combos, err := readLines(c.String("file"))
+		combos, err := files.ReadLines(c.String("file"))
 		if err != nil {
 			log.Fatalf("readLine: %s", err)
 		}
@@ -169,14 +163,14 @@ func sshCombo(c *cli.Context) error {
 
 func sshPlaintext(c *cli.Context) error {
 	if c.String("userfile") != "" {
-		users, err := readLines(c.String("userfile"))
+		users, err := files.ReadLines(c.String("userfile"))
 		if err != nil {
 			log.Fatalf("readLines: %s", err)
 		}
 		for user := range users {
 // userfile + passfile
 			if c.String("passfile") != "" {
-				passwords, err := readLines(c.String("passfile"))
+				passwords, err := files.ReadLines(c.String("passfile"))
 				if err != nil {
 					log.Fatalf("readLines: %s", err)
 				}
@@ -199,7 +193,7 @@ func sshPlaintext(c *cli.Context) error {
 	} else {
 // username + passfile
 		if c.String("passfile") != "" {
-			passwords, err := readLines(c.String("passfile"))
+			passwords, err := files.ReadLines(c.String("passfile"))
 			if err != nil {
 				log.Fatalf("readLine: %s", err)
 			}
