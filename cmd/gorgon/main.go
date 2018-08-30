@@ -51,6 +51,10 @@ func main() {
 					Name: "Tyler Booth",
 					Email: "dru1d@foofus.net",
 			},
+			cli.Author {
+					Name: "Ian Odette",
+					Email: "stumblebot@foofus.net",
+			},
 	}
 
 	app.Copyright = "Copyright (C) 2018 Tyler Booth; inspired by Joe 'jmk' Mondloch"
