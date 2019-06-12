@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"errors"
 	"strings"
-	"sync"
 	"time"
 	"golang.org/x/crypto/ssh"
 	"github.com/dru1d-foofus/gorgon/helpers/files"
@@ -19,7 +18,6 @@ import (
 )
 
 var (
-inittime = time.Now()
 sshSubcommands = []cli.Command{
 		{
 			Name:   "combo",
@@ -28,7 +26,7 @@ sshSubcommands = []cli.Command{
 			Flags: []cli.Flag {
 				cli.StringFlag {
 					Name:  "file, f",
-					Usage: "combo file in tab delimited format: ex. HOST[TAB]USER[TAB]PASS format",
+					Usage: "combo file in tab delimited format: ex. HOST[TAB]USER[TAB]PASS[TAB]DOMAIN format",
 				},
 				cli.StringFlag {
 					Name:  "port",
@@ -91,11 +89,6 @@ sshBrute = cli.Command {
 			Subcommands: sshSubcommands,
 		}
 )
-
-type resp struct {
-	Error error
-	mu sync.Mutex
-}
 
 
 func sshAuth(username string, password string, host string, port string, timer int) *resp {

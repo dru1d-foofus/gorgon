@@ -3,7 +3,8 @@ package main
 import (
 		"fmt"
 		"os"
-
+		"sync"
+		"time"
 		"github.com/fatih/color"
 		"github.com/sirupsen/logrus"
 		"github.com/urfave/cli"
@@ -17,7 +18,13 @@ var (
 		cliLogger				= standard.NewStandardLogger(nil, "gorgon", "cli", false, false)
 		displayBefore 			= true
 		debugOutput				= false
+		inittime 				= time.Now()
 )
+
+type resp struct {
+	Error error
+	mu sync.Mutex
+}
 
 func init() {
 	cli.HelpFlag = cli.BoolFlag{Name: "help, h"}
