@@ -106,19 +106,21 @@ func smbAuth(username string, password string, host string, domain string, port 
 	}
 	debug := false
 	session, err := smb.NewSession(clientConf, debug)
-	if err != nil {
-			log.Fatalln("[!]", err)
-	}
-	defer session.Close()
 //	end := time.Now()
 //	d := end.Sub(inittime)
 //	duration := d.Seconds()
 	if session.IsAuthenticated {
-			fmt.Printf("\nUser: %s Password: %s [%s]", username, password, color.GreenString("SUCCESS"))
+		err = session.TreeConnect("ADMIN$")
+		if err != nil {
+			fmt.Printf("\nUser: %s Password: %s [%s]", username, password, color.GreenString("SUCCESS - ADMIN$ DENIED"))
+		} else {
+			fmt.Printf("\nUser: %s Password: %s [%s]", username, password, color.GreenString("SUCCESS - ADMIN$ ALLOWED"))
+		}		
 	} else {
 			fmt.Printf("\nUser: %s Password: %s [%s]", username, password, color.RedString("FAILED"))
+			defer session.Close()
 	}
-	respond.Error = err
+	//respond.Error = err
 	return respond
 }
 
