@@ -81,6 +81,7 @@ func main() {
 	if err != nil {
 			cliLogger.Fatalf("Error Encountered: %v", err)
 	}
+	fmt.Println("")
 }
 
 func moduleNotImplemented(c *cli.Context) error {

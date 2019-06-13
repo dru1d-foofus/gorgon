@@ -115,7 +115,7 @@ func smbAuth(username string, password string, host string, domain string, port 
 			fmt.Printf("\nUser: %s Password: %s [%s]", username, password, color.GreenString("SUCCESS - ADMIN$ DENIED"))
 		} else {
 			fmt.Printf("\nUser: %s Password: %s [%s]", username, password, color.GreenString("SUCCESS - ADMIN$ ALLOWED"))
-		}		
+		}
 	} else {
 			fmt.Printf("\nUser: %s Password: %s [%s]", username, password, color.RedString("FAILED"))
 			defer session.Close()
@@ -169,9 +169,9 @@ func smbPlaintext(c *cli.Context) error {
 				}
 				for password := range passwords {
 					resp := smbAuth(users[user],passwords[password],c.String("host"), c.String("domain"), c.Int("port"),c.Int("timeout"))
-		        	resp.mu.Lock()
-	            		if resp.Error == nil {
-			        		resp.mu.Unlock()
+					resp.mu.Lock()
+					if resp.Error == nil {
+						resp.mu.Unlock()
 					}
 				}
 // userfile + password
